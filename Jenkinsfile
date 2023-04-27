@@ -25,7 +25,7 @@ pipeline {
 
 		stage('Deploy') {
 			steps {
-			    sh "mvn jar:jar deploy:deploy"
+			    sh "mvn spring-boot:build-image"
 			}
 		}
 	}
