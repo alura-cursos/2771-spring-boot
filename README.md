@@ -8,6 +8,7 @@ sudo apt upgrade -y
 sudo reboot
 ```
 Sempre em uma VM nova eu atualizo todos os pacotes e reinicio, algumas imagens estao muito defasadas
+
 *Always upgrade all packages on a new VM as the images are often outdated.*
 ```
 sudo apt install maven openjdk-17-jre docker.io docker-compose
@@ -26,7 +27,7 @@ Cria o grupo docker e adiciona o usuario pra não precisar ficar usando sudo com
 nano docker-compose.yaml
 ```
 Aqui criamos o arquivo do compose que vai abrigar os bancos de dados sem precisar instalar o Mysql na maquina
-*Create the docker-compose file to run Mysql in a conteiner for the application *
+*Create the docker-compose file to run Mysql in a conteiner for the application*
 
 O conteudo abaixo cria o banco com o usuario vollmed, senha e senha do root e deve estar dentro do docker-compose.yaml
 *The  content below should be inside the docker-compose.yaml file*
@@ -56,7 +57,7 @@ certifique-se de mudar no seu arquivo /src/main/resources/application.properties
 docker-compose up -d	  
 
 ```
-Buscar a imagem e configura o conteiner de acordo com os dados acima 
+Buscar a imagem e configura o conteiner de acordo com os dados acima
 *It will pull the mysql image and configure the conteiner as wee need.*
 
 ```
