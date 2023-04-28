@@ -57,6 +57,7 @@ certifique-se de mudar no seu arquivo /src/main/resources/application.properties
 *the data regarding user and paswword needs to be the same in your /src/main/resources/application.properties file*
 
 > spring.datasource.username=vollmed
+
 > spring.datasource.password=p^IMJ2D-iWQ^Jf=
 
 ```
