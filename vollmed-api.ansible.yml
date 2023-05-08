@@ -1,0 +1,109 @@
+---
+- name: Setup vollmed API on Ubuntu
+  hosts: all
+  become: yes
+  vars:
+    docker_volume: db_data
+    docker_network: ansible_net
+    db_name: vollmed_api
+    docker_volume_test: db_data_test
+    db_name_test: vollmed_api_test
+    mysql_root: ej573.CP26f:cK@
+    mysql_user: vollmed
+    mysql_password: p^IMJ2D-iWQ^Jf=
+  
+  
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: yes
+        force_apt_get: yes
+        autoremove: yes
+
+    - name: Install required packages
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - maven
+        - openjdk-17-jre
+        - docker.io
+        - docker-compose
+
+    - name: Create docker group
+      group:
+        name: docker
+        state: present
+
+    - name: Add current user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        append: yes
+        groups: docker
+    
+    - name: Create a network
+      docker_network:
+        name: "{{ docker_network }}"
+    
+    - name: Clone vollmed API git repo
+      git:
+        repo: https://github.com/santos-adilio/DevOpsChallenge2023.git
+        dest: /home/ubuntu/DevOpsChallenge2023
+    
+    - name: "Launch database container for production"
+      docker_container:
+        name: "{{ db_name }}"
+        image: mysql:latest
+        volumes:
+          - "{{ docker_volume }}:/var/lib/mysql:rw"
+        restart: true
+        networks:
+          - name: "{{ docker_network }}"
+        #alias:
+        #  - "{{ db_name }}"
+        env:
+          MYSQL_ROOT_PASSWORD: "{{ mysql_root}}"
+          MYSQL_DATABASE: "{{ db_name }}"
+          MYSQL_USER: "{{ mysql_user}}"
+          MYSQL_PASSWORD: "{{ mysql_password}}"
+
+    - name: "Launch database container for tests"
+      docker_container:
+        name: "{{ db_name_test }}"
+        image: mysql:latest
+        volumes:
+          - "{{ docker_volume }}:/var/lib/mysql:rw"
+        restart: true
+        networks:
+          - name: "{{ docker_network }}"
+        #alias:
+        #  - "{{ db_name_test }}"
+        env:
+          MYSQL_ROOT_PASSWORD: "{{ mysql_root}}"
+          MYSQL_DATABASE: "{{ db_name_test }}"
+          MYSQL_USER: "{{ mysql_user}}"
+          MYSQL_PASSWORD: "{{ mysql_password}}"
+
+    - name: Wait for MySQL service to start
+      wait_for:
+        host: localhost
+        port: 3306
+        state: started
+        timeout: 60
+################################################################
+#Build command
+################################################################
+    - name: Build the vollmed API using Maven
+      command: mvn clean package -DskipTests
+      args:
+        chdir: /home/ubuntu/DevOpsChallenge2023
+
+    - name: Run the vollmed API
+      command: java -jar -DDATASOURCE_URL=jdbc:mysql://localhost/vollmed_api -DDATASOURCE_USERNAME=vollmed -DDATASOURCE_PASSWORD=p^IMJ2D-iWQ^Jf= /home/ubuntu/DevOpsChallenge2023/target/api-0.0.1-SNAPSHOT.jar -Dspring.profiles.active=prod
+      args:
+        chdir: /home/ubuntu/DevOpsChallenge2022
