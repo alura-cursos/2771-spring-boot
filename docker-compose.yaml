@@ -1,0 +1,14 @@
+version: '3'
+services:
+  db:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_USER: vollmed
+      MYSQL_PASSWORD: p^IMJ2D-iWQ^Jf=
+      MYSQL_DATABASE: vollmed_api
+      MYSQL_ROOT_PASSWORD: ej573.CP26f:cK@
+    ports:
+      - "3306:3306"
+    volumes:
+      - /home/ubuntu/mysql_vollmed:/var/lib/mysql
